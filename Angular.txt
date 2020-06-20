@@ -1,0 +1,202 @@
+<link rel="stylesheet" 
+      href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" 
+      integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" 
+      crossorigin="anonymous">
+Angular
+-------
+import { Component,Input} from '@angular/core';
+
+
+@Component({...})
+export class AppareilComponent {
+@Input() appareil:string;//<app-appareil appareilName='tele'></...>
+}
+Directive structurel
+--------------------
+<div *ngIf="appareilStatus ==='eteint'"></div>
+<ul class="list-group">
+  <app-appareil *ngFor="let appareil of appareils;let i = index"
+                [indexOfAppareil]="i" 
+                [appareilNane]="appareil.name"
+                [appareilStatus]="appareil.status">
+  </app-appareil>
+</ul>
+Directive par attribut
+<h1 [ngStyle]="{color:getColor()}">...</h1>
+<li [ngClass]="{'list-group-item':true,
+                'list-group-item-success': appareilStatus==='allume',
+                 'list-group-item-danger':appareilStatus==='eteint'}">
+</li>
+Service
+-------
+app-->service-->appareil_service.ts
+                  export class AppareilService{
+                      appareils=[{name:'machine',status:'eteint'},{}]
+                  }
+
+app.module.ts
+import {AppareilService} from './service/appareil_service';
+....
+providers:[
+AppareilService
+]
+Pour l'utiliser on l'injecte dans un constructeur
+import {Component,OnInit} from '@angular/core';
+import {AppareilService} from './service/appareil_service';
+...
+@Component({})
+export class AppComponent implements OnInit{
+appareils:any[];
+constructor(private  AppareilService: AppareilService){}
+ngOnInit(){
+ this.appareils=this.AppareilService.appareils;
+}
+}
+Routing
+-------
+app.module.ts
+....
+import {Routes,RouterModule} from '@angular/router';
+const appRoutes:Routes=[
+   {path:'appareils',component:AppareilViewComponent};
+   {path:'appareil/:id',component:SingleAppareil}
+]
+...
+ imports:[
+  RouterModule.forRoot(appRoutes)
+],
+app.component.html
+<li routerLinkActive="active"><a routerLink="appareils">accueil</a></li>
+<router-outlet></router-outlet>
+//navigation
+import {Router} from '@angular/router';
+export class ..{
+...
+constructor(private router : Router){
+   
+}
+onsignIn(){
+  this.router.navigate(['appareil']);
+}
+}
+---
+import { ActivatedRoute} from '@angular/router';
+export class SingleComponent{
+ name:string;
+ constructor(private route:ActivedRoute,private appareilService:AppareilService){}
+ ngOnInit(){
+   const id = this.route.snapshot.params['id'];
+   this.name = this.appareilService.getAppareilById(+id).name;
+}
+}
+Redirection
+-----------
+const appRoutes : Routes =[
+  ....
+  { path:'not-found',component=UfoundComponent},
+  {path:'**',redirectTo:'/not-found']
+];
+Auth-guard.service.ts(services)
+---------
+import {ActivatedRouteSnapshot,Router,RouterStateSnapshot,CanActivate} from '@angular/router';
+import {Observable} from 'rxjs/Observable';
+export class AuthGuard implements CanActivate{
+   constructor(private authService:AuthService,private router:Router){}
+   canActivate(route:ActivatedRouteSnapshot,state:RouterStateSnapshot):
+                       Observable<boolean>|Promise<boolean>|boolean{
+     
+          if(this.authService.isAuth){
+             return true;
+           }else{
+             this.router.navigate(['/auth']);
+           }
+    }
+}
+Proteger les routes
+{path:'appareil',canActivate:['AuthGuard'],component:Appareil}
+Observable
+----------
+import {Observable} from 'rxjs/Observable';
+import 'rxjs/Rx';
+import {Subscription} from 'rxjs/Subscription';
+
+export class AppComponent implements OnInit,OnDestroy{
+  secondes:number;
+  counterSubscription:Subscription;
+
+  ngOnInit(){
+   const counter = Observable.interval(1000);
+   /*counter.subscribe(
+    (value:number)=>{this.secondes=value;},
+    (error:any)=>{console.log('erreur');},
+    ()=>{console.log('complete');}
+   )*/
+   this.counterSubscription = counter.subscribe(
+        (value:number)=>{
+      this.secondes = value;
+     }
+   );
+  }
+  ngOnDestroy(){
+    this.counterSubscription.unsubscribe();
+  }
+}
+ReactiveForms
+-------------
+app.module.ts
+import {ReactiveFormsModule} from'@angular/forms';
+...
+import:[
+ ReactiveFormsModule
+]
+new-user.component.ts
+import {FormGroup,FormBuilder,Validators} from '@angular/forms';
+import {Router} from '@angular/router';
+..
+export class NewUserComponent implements OnInit{
+  userForm:FormGroup;
+  constructor(private formBuilder:FormBuilder,private userService:UserService
+              private router:Router){}
+ngOnInit(){
+  this.initForm();
+}
+initForm(){
+  this.userForm = this.formBuilder.group({
+  firstName:['',Validators.required],
+  lastName:'',
+  email:['',[Validators.required,Validators.email]]
+  drinkPreference:''
+  });
+}
+onSubmitForm(){
+  const formValue = this.userForm.value;
+  const newUser = new User(
+   formValue['firstName'],
+   ....
+  );
+  this.userService.addUser(newUser);
+  this.router.navigate(['users']);
+}
+}
+new-user.component.html
+<div>
+  <form [formGroup]="userForm" (ngSubmit)="onSubmitForm()">
+   <div class="form-group>
+     <label for="firstName">Prenom</label>
+     <input type="text" class="form-control" id="firstName" formControlName="firstName">
+   </div>
+   ....
+  </form>
+</div>
+Interceptor
+-----------
+ import { HTTP_INTERCEPTORS } from '@angular/common/http'
+....
+,
+providers:[
+ {
+   provide:HTTP_INTERCEPTORS,
+   useClass:AppInterceptorService,
+   multi: true
+ }
+]

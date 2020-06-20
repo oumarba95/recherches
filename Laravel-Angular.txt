@@ -1,0 +1,163 @@
+ON Laravel
+----------
+Add these lines in your public/index.php:
+
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, PATCH, PUT, DELETE, OPTIONS');
+header('Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token');
+
+On Angular
+----------
+ng g s service/task
+task.service.ts
+import {Injectable} from '@angular/core';
+import { Headers , RequestOptions } from '@angular/http';
+
+@Injectatble({
+  providedIn:'root'
+})
+export class TaskService {
+  headers:Headers = new Headers();
+  options:any;
+
+  constructor(){
+    this.headers.append('enctype','multipart/form-data');
+    this.headers.append('Content-Type','application/json');
+    this.headers.append('x-Requested-With','XMLHttpRequest');
+
+    this.options = new RequestOptions({headers:this.headers});
+  }
+}
+app.module.ts
+...
+import { HttpClientModule } from '@angular/common/http';
+
+
+.....
+imports:[
+  HttpClientModule,
+]
+task.service.ts
+import {HttpClient} from '@angular/common/http';
+import {Observable,Subject} from 'rxjs';
+export class TaskService{
+..
+server:string='http://localhost::8000/';
+private _refresh = new Subject<void>();
+constructor(private http:HttpClient){
+....
+}
+....
+addTask(title):Observable<Task>{
+  const newTask = new Task(title);
+  return this.http.post<Task>(this.server+'add',newTask)
+   .pipe(
+      tap(()=>{
+        this._refresh.next();
+      }) 
+    );
+  
+}
+getTask():Observable<Task[]>
+{
+ return this.http.get<Task[]>(this.server+'get');
+}
+}
+]
+...
+export TaskFormComponent{
+ ...
+add(e){
+  e.preventDefault();
+  this.ts.addTask(this.title).subscribe((data)=>{console.log("task added");});
+}
+}
+export class TaskListComponent implements OnInit{
+tasks:Task[]=[];
+constructor(private taskservice:TaskAervice){}
+ ngOnInit(){
+  this.getAllTasks();
+}
+getAllTasks(){
+  this.taskservice.getTasks().subscribe((all)=>{this.tasks=all})
+}
+}
+Backend
+-------
+AUTH with jwt
+composer require tymon/jwt-auth
+
+Add service provider ( Laravel 5.4 or below )
+-----------------------------------------------
+Add the service provider to the providers array in the config/app.php config file as follows:
+
+'providers' => [
+
+    ...
+
+    Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
+]
+----
+Publish the config
+--------------------
+Run the following command to publish the package config file:
+
+php artisan vendor:publish --provider="Tymon\JWTAuth\Providers\LaravelServiceProvider"
+
+
+You should now have a config/jwt.php file that allows you to configure the basics of this package.
+
+Generate secret key
+-------------------
+
+I have included a helper command to generate a key for you:
+
+php artisan jwt:secret
+class User extends Authenticatable implements JWTSubject
+{
+    use Notifiable;
+
+    // Rest omitted for brevity
+
+    /**
+     * Get the identifier that will be stored in the subject claim of the JWT.
+     *
+     * @return mixed
+     */
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    /**
+     * Return a key value array, containing any custom claims to be added to the JWT.
+     *
+     * @return array
+     */
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
+}
+...
+'defaults' => [
+    'guard' => 'api',
+    'passwords' => 'users',
+],
+
+...
+
+'guards' => [
+    'api' => [
+        'driver' => 'jwt',
+        'provider' => 'users',
+    ],
+],
+This will update your .env file with something like JWT_SECRET=foobar
+frontend
+--------
+ng g c components/navbar
+ng g c components/signup
+ng g c components/profile
+ng g c components/password/request-reset
+ng g c components/password/response-reset
