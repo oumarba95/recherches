@@ -157,6 +157,65 @@ app.post('/',(request,response) => {
        response.redirect('/');
     }
 });
+Middleware
+----------
+flash.js
+module.exports = function(request,response,next){
+    
+        if(request.session.flash){
+            response.locals.flash = request.session.flash;
+            request.session.flash = undefined;
+        }
+
+        request.flash = function(type,content) {
+            if(request.session.flash === undefined){
+                request.session.flash = {};
+            }
+            request.session.flash[type] = content;
+        }
+        next();
+}
+utilisation 
+request.flash('error','oii');
+npm i -S mysql
+
+db.js
+let mysql = require('mysql');
+
+let connection = mysql.createConnection({
+   host:'localhost',
+   user:'root',
+   password:'',
+   database:'tutorile'
+});
+connection.connect();
+
+module.exports = connection;
+message.js
+let connection = require('../config/db');
+
+class Message {
+
+    static create(content,cb) {
+        connection.query('insert into messages set  content = ?,created_at = ?',[content,new Date()],(err,result) => {
+            if(err) throw err;
+            cb(result);
+        })
+    }
+    static all(cb) {
+        connection.query('select * from messages',(err,rows) =>{
+            if(err) throw err;
+            cb(rows);
+        })
+    }
+}
+
+
+module.exports = Message;
+
+npm i -S moment(gere le temps)
+savoir quel mode
+process.env.NODE_ENV = "production";
 
 
 
