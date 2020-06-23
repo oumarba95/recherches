@@ -217,6 +217,36 @@ npm i -S moment(gere le temps)
 savoir quel mode
 process.env.NODE_ENV = "production";
 
+npm i -S sequelize@3.30.4
+sequelize init
+create model
+sequelize model:create --attributes "email:string,username:string,password:string,bio:string
+isAdmin:boolean" --name 
+association
+User(model)
+models.User.hasMany(models.Message);
+Message(migrations)
+      user_id: {
+        allowNull: false,
+        type: Sequelize.INTEGER,
+        references:{
+          model:'Users',
+          key:'id'
+        }
+      },
+
+Messages model
+/relations
+    models.Message.belongsTo(models.User,{
+      foreignKey:{
+        allowNull:false
+      }
+    })
+migration
+sequilize db:migrate
+
+
+
 
 
 
