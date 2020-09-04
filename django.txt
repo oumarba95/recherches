@@ -1,0 +1,157 @@
+templates et static files
+-------------------------
+settings
+
+TEMPLATES [
+   DIRS:[os.path.join(BASE_DIR,'templates')]
+
+]
+
+STATICFILES_DIRS = (
+  os.path.join(BASE_URL,'static'),
+)
+
+#setting media files
+MEDIA_URL='/media/'
+MEDIA_ROOT=os.path.join(BASE_DIR,'media')
+
+gender = models.CharField(max_length=50,choices=(
+    ('male','Male'),
+    ('female','Female')
+))
+
+image = models.ImageField(upload_to='images/')
+
+#customize admin
+urls
+admin.site.site_header = 'Contacts'
+admin.site.index_title ='welcome to project'
+admin.site.site_title = 'oop'
+#unregister group
+admin.py
+from django.contrib.auth.models import Group
+admin.site.unregister(Group)
+#customize
+admin.py
+class ContactAdmin(admin.ModelAdmin):
+  list_display =('name','gender','info)
+  list_display_links =('id','email')
+  list_editable=('info',)
+  list_per_page = 10
+  search_fields=('name','gender','info')
+  list_filter=('gender','date_added')
+
+admin.site.register(Contact,ContactAdmin) 
+#display image after configuring media url and media root
+urls.py
+from django.conf import settings
+from django.conf.urls.static import static
+
+urlpatterns = [
+ 
+]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
+#for times
+from django.utils.timezone import datetime
+date_added = models.DateTimeField(default=datetime.now)
+##listview,detailview
+views.py
+from django.views.generic import ListView,DetailView
+
+class HomepageView(ListView):
+   template_name = 'index.html'
+   model = Contact
+   context_object_name = 'contacts'
+
+#Create view
+from django.views.generic.edit import CreateView,UpdateView,DeleteView
+class ContactCreateView(CreateView):
+   model = Contact
+   template_name = 'create.html'
+   fields = ['name','email']
+   success_url='/'
+
+class ContactUpdateView(CreateView):
+   model = Contact
+   template_name = 'update.html'
+   fields = ['name','email']
+   success_url='/' ou  def form_valid(self,form){
+                          instance = form.save()
+                          return redirect('detail',instance.pk)
+                       }
+
+class ContactDeleteView(CreateView):
+   model = Contact
+   template_name = 'delete.html'
+   success_url = '/'
+#ordering in class
+
+class
+
+  class Meta:
+     ordering:['-id']
+
+#alors d;apres precedent on a
+urls.py
+path('',views.HomepageView.as_view())
+#filtering
+Contact.objects.filter(name__icontains='papa')
+#advancing filter
+from django.db.models import Q
+Contact.objects.filter(Q(name__icontains='papa')| Q(email__icontains='papa'))
+addin authhentication
+---------------------
+urls
+urlpatterns=[
+path('',include('django.contrib.auth.urls'))
+#registration
+from django.contrib.auth.forms import UserCreationForm
+class SignUpView(createView):
+     form_class = UserCreationForm
+     template_name = 'registration/signup.html'
+     success_url = 'home'
+#Login required
+views.py
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+class ContactUpdateView(LoginRequiredView,updateView):
+
+but for function you may use decorateur
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def function yh():
+#adding foreignkey modelfield
+class Contact(models.Model):
+   manager = models.ForeignKey(User,on_delete=models.CASCADE,default=none)
+   .....
+   Class ContactCreateView(LoginRequiredMixin,createView):
+           model = contact
+           template_name = 'create.html'
+           fields = ['name','email']
+    
+       def form_valid(self,form):
+          instance = form.save(commit=false)
+          instance.manager = self.request.user
+          instance.save()
+          return redirect('detail',instace.pk)
+#Showing contacts of logged in user only
+class HomePageView(LoginRequiredMixin,listView):
+   template_name = 'index.html'
+   model = Contact
+   context_object_name = 'contacts'
+   
+   def get_queryset(self):
+      contacts = super().get_queryset()
+      return contacts.filter(manager = self.request.user)
+#django messages framework
+views.py
+from django.contrib import messages
+messages.success(self.request,'your message')
+
+class ContactDeleteView(LoginRequiredMixin,DeleteView):
+    model = Contact
+    template_name='delete.html'
+    success_url='/'
+    def delete(self,request,*args,**kwargs):
+        messages.success(self.request,'your message')
+        return super().delete(self,request,*args,**kwargs)

@@ -1,0 +1,79 @@
+id
+id -u (id)
+id --user(id)
+id -u -n (name)
+id -u root (identifiant root)
+
+echo $USER
+echo $HOSTNAME
+echo $PWD
+
+set affiche toutes les variables du systeme
+etudiant = oumar
+unset etudiant
+
+commandes internes
+type cd (type commande cd)
+
+alias
+ alias f="ls -F"
+
+fonctions
+oumar(){ cd $1;ls;}
+
+vim .bashrc
+source .bashrc
+
+df -h
+sudo fdisk -l | grep ^Disque
+fmt -u uniformar les espace
+execution conditionnelle
+cmd A && cmd B
+cmd A || cmd B
+
+archive et restauration
+tar -cvf archive.tar /tr
+tar -cvzf archive.tar.gz /tr
+tar -xvf archive.tar
+find . -name 'a*' -exec cmd {}\;
+tar 
+----------
+cp /etc/issue .
+'.' repertoire de tarvail
+'..' repertoire parent
+cd -
+'-' repertoire precedent
+
+sed(recherche et remplace)
+sed -i s/jean/cyriac/Ig participants
+
+head -2 (affiche les 2 premiers lignes)
+tail -2 (....2 derniers lignes)
+
+du -h fichier (taille)
+split
+split -b 4k fichiers (b nbres kb,mb..)
+
+split -l 2 participants(l nbres de ligne)
+
+cat participant | head -3
+
+ps processus en cours
+kill Id(id processus)
+ctrl C
+ctr z
+fg 1
+les champs de etc/passwd
+login:mdp:uid:gid:comments:rep perso:shell
+
+PS3 pour le prompt
+REPLY le numero choisi
+PS3="choisir un plat"
+select plat in "kk" "ll";
+do 
+  echo "vous avez choisi le $plat correspondant au numero $REPLY"
+
+
+
+
+

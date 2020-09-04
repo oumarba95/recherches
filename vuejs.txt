@@ -1,0 +1,187 @@
+vue ressource
+-------------
+npm i vue-resource
+
+main.js
+import VueResource from 'vue-resource'
+import VueRouter from 'vue-router'
+import Vuex from 'vuex'
+
+Vue.use(VueRouter)
+const router = new VueRouter({
+  mode: 'history',
+  routes:[{
+    path: '/',
+    component: require('./components/Hello.vue'),  //<router-link :to={name : 'apa',params:{id : 1}}
+    name :'apa'
+  },
+  {
+    path:'/articles/:id(\\d+)',                // {{ $router.params.id }}
+    component:require('./components/Hello.vue')
+  },
+  {
+   path:'*',
+   redirect: '/'
+  }
+]
+
+watch:{
+ "$route.qyuery.search':{
+      immediate:true,
+      handler(value){
+        this.search = value
+      }
+  }
+}
+})
+Vue.use(VueResource)
+
+Vue.http.options.root = 'http://localhost:8080'
+Vue.http.headers.common['Authorization'] = 'Basic '
+Vue.http.interceptors.push((request,next) => {
+   next((res) => {
+     if(request.after) {
+       request.after.call(this,response)
+     }
+   })
+})
+new Vue ({
+ el:'#app',
+ router
+
+})
+App.js
+
+export default {
+
+   data () {
+    return {
+     users:[]
+    }
+  },
+  mounted () {
+    
+    this.$http.get(url).then((res) => { this.users = res.data},(err) => {})
+      ou utiliser un resource
+    
+    this.$user = this.$resource('users{/id}',{},{
+       before : () => {
+         this.loading = true
+      },
+      after:() => {
+        this.loading = false
+      }
+    })
+    
+    this.$user.query().then((res) => {
+    },
+    (err) => {...})
+
+  },
+  methods: {
+   save(user){
+     this.$user.update({id: user.id},{name:user.name}).then((res) => {
+    
+    },(res) => {
+      
+    })
+   },
+   destroy(user) {
+     this.$user.remove ({id: user.id}).then()
+   }
+  }
+}
+Vue router
+----------
+npm i -S vue-router
+
+PageA
+export default {
+  data () {
+    return {
+      msg:'Salut'
+    }
+  },
+  beforeRouteEnter(route,redirect,next) {
+    ...
+    next(vm => { vm.msg = 'La route est chargee'})
+  }
+
+}
+VueX
+----
+mpn i -S vuex
+
+main.js
+import Vuex from 'vuex'
+
+
+TodosStore.js
+import Vuex from 'vuex'
+const store = {
+  todos:[{name:'papa',completed:true}]
+}
+const mutations = {
+ ADD_TODOS: (state,name) => {
+   state.todos.push({name:'papa',completed:false})
+ }
+}
+
+const actions = {
+  addTodo:(store,name) => {
+    store.commit('ADD_TODO',name)
+  }
+}
+
+const getters = {
+  todos:state => state.todos,
+  completedTodos: state => state.todos.filter(todo => todo.completed)
+}
+export default new Vuex.Store({
+  state:store,
+  mutations:mutations,
+  getters:getters,
+  actions:actions,
+  strict:true
+
+})
+
+Todos.vue
+import store from './TodosStore'
+import Vuex from 'vuex'
+
+<script>
+  export default {
+    store : store
+
+
+   computed : {
+     ...Vuex.mapGetters([
+       'todos',
+       'remainingTodos'
+     ]),
+    ...Vuex.mapActions([
+       'addTodo'
+     ])
+   }
+  }
+
+  
+</script>
+vuex-router-sync
+
+main.js
+import {sync} from 'vuex-router-sync'
+import store form '@component/.....'
+
+vuex.mapState({
+  'isUserLoggedIn'
+npm install vuex-persistedsate
+import createPersistedState from 'vuex-persistedState'
+
+const store = new Vuex.Store({
+    plugins:[createPersistedSate]
+})
+})
+
+syn(store,router)

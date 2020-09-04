@@ -1,0 +1,43 @@
+Plan du ours d'UML
+
+Chapitre 1 : Introduction au Génie Logiciel
+
+Chapitre 2 : Introduction au UML
+
+Chapitre 3 : Quelques diagrammes Statiques (Structurels)
+
+Use CASE (Cas d'utilisation)
+Class Diagramm (Diagramme des classes)
+Diagramme d'objects
+
+Chapitre 4 : Diagrammes Dynamiques (comportementaux)
+Diagramme de séquence
+UML
+---
+Diagramme
+1.Diagramme de structures
+  a.Diagramme de classe
+    Ce diagramme represente l'organisation des classes de l'application.
+    -les associations
+       Une association est une relation structurelle entre objets.
+       Les types d'association
+         -association unidirectionnelle ->
+         -association bi-diectionnelles -
+      1.Association non porteuse
+       Pas de classe d'association
+      2.Association porteuse
+      Avec classe-association
+      3.Agregation
+       contient
+      4.Composition
+       contient physiquement
+    b.Diagramme d'objet
+        Un diagramme d'objets UML représente une instance spécifique d'un diagramme de classes à un moment précis. Dans sa représentation visuelle, il est très similaire à un diagramme de classes.
+2.Diagramme de comportement
+a.Diagramme de cas d'utilisation
+Ce diagramme se presente sous 2 formes:
+ => schema regroupant les activites d'un acteur
+ =>tableau detaillant les actions liees a une activite
+b.Diagramme de sequence
+Les diagrammes de séquences permettent de décrire COMMENT les éléments du système interagissent entre eux et avec les acteurs :
+

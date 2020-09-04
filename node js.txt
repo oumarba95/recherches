@@ -244,9 +244,79 @@ Messages model
     })
 migration
 sequilize db:migrate
+WaterFull avec la librairie async
 
+sequelize db:drop
+sequelize db:create
+sequelize db:migrate
+la valeur de la relation
+            include : [{
+              model : models.User,
+              attributes :['username']
+            }]
+NodeMailer
+npm install nodemailer
+var nodemailer = require('nodemailer');
+var transporter = nodemailer.createTransport(
+        service: 'gmail',
+        auth: {
+            user: 'sender@gmail.com',
+            pass: 'password'
+        }
+);
+var mailOptions = {
+        from: req.body.sender,
+        to: req.body.destination,
+        subject: req.body.subject,
+        text: req.body.message,
+        html: '<b>' + req.body.message + '</b>'
+};
+transporter.sendMail(mailOptions, function(error, info){
+     if(error){
+        return console.log(error);
+     }
+     console.log('Message sent: ' + info.response);
+});
 
+transporter.close();
+uploader un fichier
+npm i formidable
+var http = require('http');
+var formidable = require('formidable');
+var fs = require('fs');
 
+http.createServer(function (req, res) {
+  if (req.url == '/fileupload') {
+    var form = new formidable.IncomingForm();
+    form.parse(req, function (err, fields, files) {
+      var oldpath = files.filetoupload.path;
+      var newpath = 'C:/Users/Your Name/' + files.filetoupload.name;
+      fs.rename(oldpath, newpath, function (err) {
+        if (err) throw err;
+        res.write('File uploaded and moved!');
+        res.end();
+      });
+ });
+  } else {
+    res.writeHead(200, {'Content-Type': 'text/html'});
+    res.write('<form action="fileupload" method="post" enctype="multipart/form-data">');
+    res.write('<input type="file" name="filetoupload"><br>');
+    res.write('<input type="submit">');
+    res.write('</form>');
+    return res.end();
+  }
+}).listen(8080);
+
+song.findAll({
+ where :{
+   $or :['',''].map(key => ({
+      [key]:{
+        $like :`%${search}%`
+      }
+})
+ } 
+}
+)
 
 
 
